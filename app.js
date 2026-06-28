@@ -66,6 +66,7 @@
       var allowed = [];
       try { allowed = api.store.getAllowed("overlay") || []; } catch (e) {}
       buildLayerButtons(allowed);
+      buildPlayControl();
       var initial = allowed.indexOf(CFG.DEFAULT_OVERLAY) >= 0 ? CFG.DEFAULT_OVERLAY
                   : (allowed[0] || "wind");
       setOverlay(initial);
@@ -81,6 +82,58 @@
     rain: "Rain", temp: "Temp", pressure: "Pressure", rh: "Humidity",
     clouds: "Clouds", snow: "Snow"
   };
+
+  /* ---------- 4-day animated forecast ---------- */
+  var anim = { timer: null, offset: 0, running: false,
+               span: 4 * 24 * 3600 * 1000, step: 3 * 3600 * 1000, frame: 500 };
+
+  function buildPlayControl() {
+    var nav = document.getElementById("layers");
+    if (!nav || document.getElementById("playBtn")) return;
+    var b = document.createElement("button");
+    b.id = "playBtn";
+    b.className = "layer-btn play-btn focusable";
+    b.textContent = "▶ 4-Day";
+    b.addEventListener("click", toggleAnim);
+    nav.appendChild(b);
+    var lbl = document.getElementById("clock");
+    if (lbl && !document.getElementById("animTime")) {
+      var span = document.createElement("span");
+      span.id = "animTime";
+      lbl.parentNode.insertBefore(span, lbl);
+    }
+  }
+
+  function toggleAnim() { anim.running ? stopAnim() : startAnim(); }
+
+  function startAnim() {
+    if (!windyAPI) return;
+    anim.running = true;
+    anim.offset = 0;
+    var base = Date.now();
+    var btn = document.getElementById("playBtn");
+    var lbl = document.getElementById("animTime");
+    if (btn) btn.textContent = "⏸ Stop";
+    anim.timer = setInterval(function () {
+      var ts = base + anim.offset;
+      try { windyAPI.store.set("timestamp", ts); } catch (e) {}
+      if (lbl) lbl.textContent = new Date(ts).toLocaleString([], {
+        weekday: "short", hour: "2-digit", minute: "2-digit"
+      }) + "  ";
+      anim.offset += anim.step;
+      if (anim.offset > anim.span) anim.offset = 0;   // loop the 4 days
+    }, anim.frame);
+  }
+
+  function stopAnim() {
+    anim.running = false;
+    clearInterval(anim.timer);
+    var btn = document.getElementById("playBtn");
+    var lbl = document.getElementById("animTime");
+    if (btn) btn.textContent = "▶ 4-Day";
+    if (lbl) lbl.textContent = "";
+    if (windyAPI) { try { windyAPI.store.set("timestamp", Date.now()); } catch (e) {} }
+  }
 
   function buildLayerButtons(allowed) {
     var nav = document.getElementById("layers");
@@ -344,7 +397,9 @@
 
   function activate(node) {
     if (!node) return;
-    if (node.classList.contains("layer-btn")) {
+    if (node.id === "playBtn") {
+      toggleAnim();
+    } else if (node.classList.contains("layer-btn")) {
       setOverlay(node.dataset.overlay);
     } else if (node.dataset.index != null) {
       selectPort(parseInt(node.dataset.index, 10));
