@@ -98,16 +98,7 @@
   /* ============================================================
    *  2) POINT FORECAST API  (per-port marine forecast)
    * ============================================================ */
-  function fetchPointForecast(port) {
-    var body = {
-      lat: port.lat,
-      lon: port.lon,
-      model: CFG.POINT_MODEL,
-      parameters: ["wind", "windGust", "waves", "swell1"],
-      levels: ["surface"],
-      key: CFG.POINT_FORECAST_KEY
-    };
-
+  function postPF(body) {
     return fetch(CFG.POINT_FORECAST_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -115,6 +106,34 @@
     }).then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
+    });
+  }
+
+  // Windy splits weather and waves across two models:
+  //   gfs      -> wind, windGust   (atmosphere)
+  //   gfsWave  -> waves, swell1     (marine)
+  // Requesting wave params from gfs returns HTTP 400, so we issue two
+  // requests and merge them. The wave call is optional (some keys/plans
+  // don't include the wave model) — if it fails we still show wind.
+  function fetchPointForecast(port) {
+    var atmo = postPF({
+      lat: port.lat, lon: port.lon,
+      model: "gfs",
+      parameters: ["wind", "windGust"],
+      levels: ["surface"],
+      key: CFG.POINT_FORECAST_KEY
+    });
+
+    var wave = postPF({
+      lat: port.lat, lon: port.lon,
+      model: "gfsWave",
+      parameters: ["waves", "swell1"],
+      key: CFG.POINT_FORECAST_KEY
+    }).catch(function () { return {}; });  // tolerate missing wave model
+
+    // atmo wins on shared keys (ts), wave adds the *_height-surface arrays.
+    return Promise.all([atmo, wave]).then(function (res) {
+      return Object.assign({}, res[1], res[0]);
     });
   }
 
