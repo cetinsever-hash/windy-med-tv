@@ -61,10 +61,43 @@
 
     windyInit(options, function (api) {
       windyAPI = api;            // { map, store, picker, broadcast, overlays, ... }
-      markActiveLayer(CFG.DEFAULT_OVERLAY);
+      // Build the layer bar from the overlays this key is actually allowed to
+      // show (free plan = wind/temp/pressure; Professional adds gust/waves/etc).
+      var allowed = [];
+      try { allowed = api.store.getAllowed("overlay") || []; } catch (e) {}
+      buildLayerButtons(allowed);
+      var initial = allowed.indexOf(CFG.DEFAULT_OVERLAY) >= 0 ? CFG.DEFAULT_OVERLAY
+                  : (allowed[0] || "wind");
+      setOverlay(initial);
       addPortMarkers(api.map);
       // Re-center on the Mediterranean basin.
       api.map.setView([CFG.MAP_DEFAULT.lat, CFG.MAP_DEFAULT.lon], CFG.MAP_DEFAULT.zoom);
+    });
+  }
+
+  // Friendly labels for Windy overlay ids.
+  var OVERLAY_LABELS = {
+    wind: "Wind", gust: "Gusts", waves: "Waves", swell1: "Swell",
+    rain: "Rain", temp: "Temp", pressure: "Pressure", rh: "Humidity",
+    clouds: "Clouds", snow: "Snow"
+  };
+
+  function buildLayerButtons(allowed) {
+    var nav = document.getElementById("layers");
+    if (!nav) return;
+    // Preferred display order; fall back to whatever else the key allows.
+    var order = ["wind", "gust", "waves", "swell1", "rain", "temp", "pressure"];
+    var list = order.filter(function (o) { return allowed.indexOf(o) >= 0; });
+    allowed.forEach(function (o) { if (list.indexOf(o) < 0) list.push(o); });
+
+    nav.innerHTML = "";
+    list.forEach(function (ov) {
+      var b = document.createElement("button");
+      b.className = "layer-btn focusable";
+      b.dataset.overlay = ov;
+      b.textContent = OVERLAY_LABELS[ov] || ov;
+      b.addEventListener("click", function () { setOverlay(ov); });
+      nav.appendChild(b);
     });
   }
 

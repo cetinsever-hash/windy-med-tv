@@ -7,6 +7,7 @@ window.MED_PORTS = [
   { name: "Palma",        country: "ES", lat: 39.50, lon: 2.60 },
   { name: "Marseille",    country: "FR", lat: 43.25, lon: 5.30 },
   { name: "Nice",         country: "FR", lat: 43.65, lon: 7.30 },
+  { name: "Cannes",       country: "FR", lat: 43.52, lon: 7.02 },
   { name: "Naples",       country: "IT", lat: 40.78, lon: 14.20 },
   { name: "Valletta",     country: "MT", lat: 35.85, lon: 14.55 },
   { name: "Split",        country: "HR", lat: 43.45, lon: 16.30 },
