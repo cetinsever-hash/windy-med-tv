@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1, user-scalable=no">
+  <title>Med Sailing Weather</title>
+
+  <!-- Leaflet (required by the Windy Map Forecast plugin) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Full-screen Windy map (map-first layout) -->
+  <div id="windy"></div>
+
+  <!-- Top bar -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="dot"></span> Med Sailing Weather
+    </div>
+    <nav id="layers" aria-label="Map layers">
+      <button class="layer-btn focusable" data-overlay="wind">Wind</button>
+      <button class="layer-btn focusable" data-overlay="gust">Gusts</button>
+      <button class="layer-btn focusable" data-overlay="waves">Waves</button>
+      <button class="layer-btn focusable" data-overlay="swell1">Swell</button>
+      <button class="layer-btn focusable" data-overlay="rain">Rain</button>
+    </nav>
+    <div id="clock"></div>
+  </header>
+
+  <!-- Side panel: per-port marine forecast (Point Forecast API) -->
+  <aside id="panel">
+    <h2>Sailing Ports</h2>
+    <ul id="portList"></ul>
+    <div id="portDetail">
+      <div class="detail-title" id="detailName">Select a port</div>
+      <div class="detail-sub" id="detailSub">Press OK / Enter on a port</div>
+      <div class="metrics" id="metrics"></div>
+      <div class="forecast-strip" id="strip"></div>
+    </div>
+  </aside>
+
+  <!-- Loading / error toast -->
+  <div id="toast" class="hidden"></div>
+
+  <script src="config.js"></script>
+  <script src="cities.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

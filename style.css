@@ -1,0 +1,191 @@
+/* ===== Med Sailing Weather — LG webOS (1920x1080, 10-ft UI) ===== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #0b1f33;
+  color: #eaf2fb;
+  font-family: "LG Smart UI", "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Full-screen map fills the whole canvas (map-first) */
+#windy {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  background: #0b1f33;
+}
+
+/* ---------- Top bar ---------- */
+#topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 96px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 0 40px;
+  background: linear-gradient(180deg, rgba(7,18,30,0.92) 0%, rgba(7,18,30,0.0) 100%);
+}
+
+.brand {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.brand .dot {
+  display: inline-block;
+  width: 16px; height: 16px;
+  margin-right: 12px;
+  border-radius: 50%;
+  background: #1e88e5;
+  box-shadow: 0 0 16px #1e88e5;
+  vertical-align: middle;
+}
+
+#layers {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.layer-btn {
+  font-size: 26px;
+  font-weight: 600;
+  color: #cfe2f6;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.layer-btn.active {
+  background: #1e88e5;
+  color: #fff;
+}
+
+#clock {
+  font-size: 30px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Side panel ---------- */
+#panel {
+  position: absolute;
+  top: 96px; right: 0;
+  width: 520px;
+  height: 984px;
+  z-index: 40;
+  padding: 28px 32px;
+  background: rgba(7,18,30,0.82);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+}
+
+#panel h2 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #9ec9f0;
+}
+
+#portList {
+  list-style: none;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+#portList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 27px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+#portList li .pname { font-weight: 600; }
+#portList li .pwind {
+  font-size: 23px;
+  color: #9ec9f0;
+  font-variant-numeric: tabular-nums;
+}
+#portList li.selected { background: rgba(30,136,229,0.25); }
+
+/* ---------- Focus ring (remote D-pad) ---------- */
+.focusable:focus,
+.focusable.focus {
+  outline: none;
+  border-color: #ffd54f !important;
+  transform: scale(1.04);
+  box-shadow: 0 0 0 4px rgba(255,213,79,0.35);
+}
+
+/* ---------- Port detail ---------- */
+#portDetail {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding-top: 22px;
+}
+.detail-title { font-size: 34px; font-weight: 700; }
+.detail-sub   { font-size: 22px; color: #9ec9f0; margin-top: 4px; margin-bottom: 18px; }
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.metric {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.metric .label { font-size: 20px; color: #9ec9f0; }
+.metric .value { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric .unit  { font-size: 20px; color: #cfe2f6; margin-left: 4px; }
+
+.forecast-strip {
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+}
+.fcell {
+  flex: 1;
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px 6px;
+}
+.fcell .h  { font-size: 18px; color: #9ec9f0; }
+.fcell .w  { font-size: 24px; font-weight: 700; }
+.fcell .g  { font-size: 17px; color: #ffd54f; }
+
+/* ---------- Toast ---------- */
+#toast {
+  position: absolute;
+  bottom: 40px; left: 40px;
+  z-index: 60;
+  background: rgba(7,18,30,0.95);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 18px 26px;
+  font-size: 24px;
+  max-width: 1000px;
+}
+.hidden { display: none !important; }
