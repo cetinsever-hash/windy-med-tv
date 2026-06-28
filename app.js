@@ -96,11 +96,12 @@
     b.textContent = "▶ 4-Day";
     b.addEventListener("click", toggleAnim);
     nav.appendChild(b);
-    var lbl = document.getElementById("clock");
-    if (lbl && !document.getElementById("animTime")) {
-      var span = document.createElement("span");
-      span.id = "animTime";
-      lbl.parentNode.insertBefore(span, lbl);
+    // Prominent timestamp banner shown over the map while playing.
+    if (!document.getElementById("animBanner")) {
+      var bn = document.createElement("div");
+      bn.id = "animBanner";
+      bn.className = "anim-banner hidden";
+      document.body.appendChild(bn);
     }
   }
 
@@ -112,14 +113,22 @@
     anim.offset = 0;
     var base = Date.now();
     var btn = document.getElementById("playBtn");
-    var lbl = document.getElementById("animTime");
+    var banner = document.getElementById("animBanner");
     if (btn) btn.textContent = "⏸ Stop";
+    if (banner) banner.classList.remove("hidden");
     anim.timer = setInterval(function () {
       var ts = base + anim.offset;
       try { windyAPI.store.set("timestamp", ts); } catch (e) {}
-      if (lbl) lbl.textContent = new Date(ts).toLocaleString([], {
-        weekday: "short", hour: "2-digit", minute: "2-digit"
-      }) + "  ";
+      if (banner) {
+        var d = new Date(ts);
+        var date = d.toLocaleDateString([], { weekday: "long", day: "numeric", month: "short" });
+        var time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        var leadH = Math.round(anim.offset / 3600000);
+        banner.innerHTML = '<span class="ab-tag">FORECAST</span>' +
+                           '<span class="ab-date">' + date + '</span>' +
+                           '<span class="ab-time">' + time + '</span>' +
+                           '<span class="ab-lead">+' + leadH + 'h</span>';
+      }
       anim.offset += anim.step;
       if (anim.offset > anim.span) anim.offset = 0;   // loop the 4 days
     }, anim.frame);
@@ -129,9 +138,9 @@
     anim.running = false;
     clearInterval(anim.timer);
     var btn = document.getElementById("playBtn");
-    var lbl = document.getElementById("animTime");
+    var banner = document.getElementById("animBanner");
     if (btn) btn.textContent = "▶ 4-Day";
-    if (lbl) lbl.textContent = "";
+    if (banner) banner.classList.add("hidden");
     if (windyAPI) { try { windyAPI.store.set("timestamp", Date.now()); } catch (e) {} }
   }
 
