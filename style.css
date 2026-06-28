@@ -201,6 +201,28 @@ html, body {
   gap: 10px;
   overflow: hidden;
 }
+
+/* Open-Meteo extras */
+.extras { margin-top: 16px; }
+.ex-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.ex {
+  background: rgba(126,200,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ex .exl { font-size: 18px; color: #9ec9f0; }
+.ex .exv { font-size: 26px; font-weight: 700; }
+.ex .exs { font-size: 15px; color: #9ec9f0; min-height: 16px; }
+.ex-line {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #9ec9f0;
+  font-variant-numeric: tabular-nums;
+}
 .fcell {
   flex: 1;
   text-align: center;

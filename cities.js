@@ -13,7 +13,11 @@ window.MED_PORTS = [
   { name: "Split",        country: "HR", lat: 43.45, lon: 16.30 },
   { name: "Corfu",        country: "GR", lat: 39.58, lon: 19.80 },
   { name: "Piraeus",      country: "GR", lat: 37.90, lon: 23.60 },
+  { name: "Athens",       country: "GR", lat: 37.90, lon: 23.55 },
+  { name: "Mykonos",      country: "GR", lat: 37.42, lon: 25.35 },
   { name: "Bodrum",       country: "TR", lat: 37.00, lon: 27.40 },
+  { name: "Marmaris",     country: "TR", lat: 36.80, lon: 28.27 },
+  { name: "Bozburun",     country: "TR", lat: 36.66, lon: 28.04 },
   { name: "Antalya",      country: "TR", lat: 36.80, lon: 30.70 },
   { name: "Limassol",     country: "CY", lat: 34.60, lon: 33.05 }
 ];

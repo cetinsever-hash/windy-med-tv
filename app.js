@@ -233,6 +233,62 @@
     });
   }
 
+  /* ---------- Open-Meteo extras (free, no API key) ---------- */
+  var WMO = {
+    0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+    45: "Fog", 48: "Rime fog", 51: "Light drizzle", 53: "Drizzle",
+    55: "Dense drizzle", 61: "Light rain", 63: "Rain", 65: "Heavy rain",
+    71: "Light snow", 73: "Snow", 75: "Heavy snow", 80: "Showers",
+    81: "Showers", 82: "Heavy showers", 95: "Thunderstorm",
+    96: "Thunderstorm", 99: "Thunderstorm"
+  };
+
+  function fetchOpenMeteo(port) {
+    var fc = fetch("https://api.open-meteo.com/v1/forecast?latitude=" + port.lat +
+        "&longitude=" + port.lon +
+        "&current=temperature_2m,weather_code,relative_humidity_2m" +
+        "&daily=sunrise,sunset&timezone=auto&forecast_days=1")
+      .then(function (r) { return r.json(); }).catch(function () { return {}; });
+    var mar = fetch("https://marine-api.open-meteo.com/v1/marine?latitude=" + port.lat +
+        "&longitude=" + port.lon +
+        "&current=sea_surface_temperature,swell_wave_height,swell_wave_period&timezone=auto")
+      .then(function (r) { return r.json(); }).catch(function () { return {}; });
+    return Promise.all([fc, mar]).then(function (res) { return { fc: res[0], mar: res[1] }; });
+  }
+
+  function renderExtras(data) {
+    var box = document.getElementById("extras");
+    if (!box) return;
+    var c = (data.fc && data.fc.current) || {};
+    var d = (data.fc && data.fc.daily) || {};
+    var m = (data.mar && data.mar.current) || {};
+    function rnd(x) { return x != null ? Math.round(x) : null; }
+    function hm(s) { return s ? String(s).slice(11, 16) : "–"; }
+
+    var air = c.temperature_2m != null ? rnd(c.temperature_2m) + "°" : "–";
+    var cond = WMO[c.weather_code] != null ? WMO[c.weather_code] : "";
+    var sea = m.sea_surface_temperature != null ? rnd(m.sea_surface_temperature) + "°" : "–";
+    var rh = c.relative_humidity_2m != null ? c.relative_humidity_2m + "%" : "–";
+    var swell = m.swell_wave_height != null
+      ? m.swell_wave_height.toFixed(1) + " m" +
+        (m.swell_wave_period != null ? " @ " + Math.round(m.swell_wave_period) + "s" : "")
+      : "–";
+    var sun = "☀ " + hm(d.sunrise && d.sunrise[0]) + " – " + hm(d.sunset && d.sunset[0]);
+
+    box.innerHTML =
+      '<div class="ex-row">' +
+        ext("Air", air, cond) +
+        ext("Sea", sea, "SST") +
+        ext("Humidity", rh, "") +
+      '</div>' +
+      '<div class="ex-line">' + sun + "  ·  Swell " + swell + "  ·  Open-Meteo</div>";
+  }
+
+  function ext(label, val, sub) {
+    return '<div class="ex"><div class="exl">' + label + '</div><div class="exv">' +
+           val + '</div><div class="exs">' + (sub || "") + '</div></div>';
+  }
+
   // Compute wind speed (m/s -> knots) from U/V components.
   function windKnots(u, v) {
     var ms = Math.sqrt(u * u + v * v);
@@ -326,6 +382,11 @@
 
     $("#detailName").textContent = port.name + " · " + port.country;
     $("#detailSub").textContent = "Loading forecast…";
+
+    // Open-Meteo extras are keyless — load them regardless of Windy keys.
+    var ex = document.getElementById("extras");
+    if (ex) ex.innerHTML = "";
+    fetchOpenMeteo(port).then(renderExtras).catch(function () {});
 
     if (keysMissing()) {
       $("#detailSub").textContent = "Add API keys in js/config.js to load live data.";
