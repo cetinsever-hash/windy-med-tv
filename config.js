@@ -20,7 +20,7 @@ window.APP_CONFIG = {
   // NOTE: Windy issues separate keys per product. If Point Forecast
   // returns 403/unauthorized, generate a dedicated Point Forecast key
   // and paste it here instead of reusing the Map Forecast key.
-  POINT_FORECAST_KEY: "Nh0tsJohzvnZTQkW7rjKTPWzjMq6ZZrx",
+  POINT_FORECAST_KEY: "MEVq1fKL2mhuAKE5NW8HhVgUOrlnXZZS",
 
   // Point Forecast endpoint (v2).
   POINT_FORECAST_URL: "https://api.windy.com/api/point-forecast/v2",

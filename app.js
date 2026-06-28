@@ -128,6 +128,7 @@
       lat: port.lat, lon: port.lon,
       model: "gfsWave",
       parameters: ["waves", "swell1"],
+      levels: ["surface"],
       key: CFG.POINT_FORECAST_KEY
     }).catch(function () { return {}; });  // tolerate missing wave model
 
