@@ -456,13 +456,22 @@
         activate(list[current.idx]);
         return;
       case KEY.BACK:
-        // Let webOS handle exit; nothing to pop.
+        // If the 4-day animation is playing, first Back stops it; next Back quits.
+        if (anim.running) { stopAnim(); e.preventDefault(); return; }
+        quitApp();
         return;
       default:
         return;
     }
     e.preventDefault();
     applyFocus();
+  }
+
+  // Close the webOS app (Back button). Tries the platform APIs, then window.close().
+  function quitApp() {
+    try { if (window.webOSSystem && window.webOSSystem.close) { window.webOSSystem.close(); return; } } catch (e) {}
+    try { if (window.webOS && window.webOS.platformBack) { window.webOS.platformBack(); return; } } catch (e) {}
+    try { window.close(); } catch (e) {}
   }
 
   function activate(node) {
